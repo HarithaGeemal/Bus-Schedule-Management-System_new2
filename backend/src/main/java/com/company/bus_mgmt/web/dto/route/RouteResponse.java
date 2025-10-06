@@ -1,6 +1,6 @@
 package com.company.bus_mgmt.web.dto.route;
 
-import com.company.busmgmt.domain.schedule.Route;
+import com.company.bus_mgmt.domain.schedule.Route;
 
 import java.time.Instant;
 

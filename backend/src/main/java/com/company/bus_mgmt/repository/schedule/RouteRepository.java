@@ -1,6 +1,6 @@
 package com.company.bus_mgmt.repository.schedule;
 
-import com.company.busmgmt.domain.schedule.Route;
+import com.company.bus_mgmt.domain.schedule.Route;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-package com.company.busmgmt.service.schedule;
+package com.company.bus_mgmt.service.schedule;
 
 import com.company.bus_mgmt.web.dto.route.RouteCreateRequest;
 import com.company.bus_mgmt.web.dto.route.RouteResponse;

@@ -3,6 +3,7 @@ package com.company.bus_mgmt.web.controller.auth;
 import com.company.bus_mgmt.service.user.AuthService;
 import com.company.bus_mgmt.web.dto.auth.LoginRequest;
 import com.company.bus_mgmt.web.dto.auth.LoginResponse;
+import com.company.bus_mgmt.web.dto.auth.PublicRegisterRequest;
 import com.company.bus_mgmt.web.dto.user.UserCreateRequest;
 import com.company.bus_mgmt.web.dto.user.UserResponse;
 import jakarta.validation.Valid;
@@ -17,6 +18,12 @@ public class AuthController {
 
     public AuthController(AuthService auth) {
         this.auth = auth;
+    }
+
+    @PostMapping("/public/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse publicRegister(@Valid @RequestBody PublicRegisterRequest req) {
+        return auth.registerPassenger(req);
     }
 
     @PostMapping("/register")

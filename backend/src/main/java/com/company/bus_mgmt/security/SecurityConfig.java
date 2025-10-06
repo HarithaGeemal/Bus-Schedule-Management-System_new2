@@ -4,12 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtTokenProvider tokens;
@@ -27,11 +29,18 @@ public class SecurityConfig {
                 .exceptionHandling(h -> h.authenticationEntryPoint(entryPoint))
                 .addFilterBefore(new JwtAuthenticationFilter(tokens), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(reg -> reg
-                        .requestMatchers("/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/actuator/health").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/bookings/search", "/api/trips/*/seats").permitAll()
+                        .requestMatchers("/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/actuator/health"
+                                ,"/v3/api-docs.yaml","/v3/api-docs/swagger-config").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh","/api/auth/public/register").permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/api/auth/public/register", "/api/public/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/bookings/search", "/api/trips/*/seats","/api/routes", "/api/routes/**").permitAll()
                         .anyRequest().authenticated()
-                );
+
+                )
+
+                .addFilterBefore(new JwtAuthenticationFilter(tokens), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }

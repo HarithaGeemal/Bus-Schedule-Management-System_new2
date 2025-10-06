@@ -1,4 +1,4 @@
-package com.company.busmgmt.domain.schedule;
+package com.company.bus_mgmt.domain.schedule;
 
 import jakarta.persistence.*;
 import lombok.Getter;

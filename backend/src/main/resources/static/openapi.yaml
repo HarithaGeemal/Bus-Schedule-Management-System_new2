@@ -28,10 +28,30 @@ tags:
   - name: Health
 
 paths:
+
+  /api/auth/public/register:
+    post:
+      tags: [ Auth ]
+      summary: Public registration (default role = PASSENGER)
+      description: Creates a new user with role PASSENGER. No authentication required.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PublicRegisterRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
   /api/auth/register:
     post:
       tags: [Auth]
-      summary: Register a new user (IT Tech or Admin only)
+      summary: Admin/IT — create user with explicit roles
       security:
         - bearerAuth: []
       requestBody:
@@ -172,6 +192,30 @@ paths:
         - $ref: '#/components/parameters/id'
       responses:
         '204': { description: Deactivated }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/users/{id}/roles:
+    post:
+      tags: [ Users ]
+      summary: Set user roles (IT Tech / Admin only)
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetRolesRequest' }
+      responses:
+        '200':
+          description: Updated user with new roles
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
@@ -883,7 +927,16 @@ components:
         roles:
           type: array
           minItems: 1
-          items: { type: string, enum: [ADMIN, OPS_MANAGER, BOOKING_CLERK, CUSTOMER_SERVICE, SENIOR_TICKETING, DRIVER, IT_TECH] }
+          items: { type: string, enum: [ADMIN, OPS_MANAGER, BOOKING_CLERK, CUSTOMER_SERVICE, SENIOR_TICKETING, DRIVER, IT_TECH ,PASSENGER] }
+
+    PublicRegisterRequest:
+      type: object
+      required: [ email, fullName, password ]
+      properties:
+        email: { type: string, format: email, maxLength: 160 }
+        fullName: { type: string, minLength: 3, maxLength: 120 }
+        password: { type: string, minLength: 8, maxLength: 100 }
+        phone: { type: string, maxLength: 32 }
 
     UserCreateRequest:
       allOf:
@@ -907,6 +960,18 @@ components:
           type: array
           items: { $ref: '#/components/schemas/RoleRef' }
         createdAt: { type: string, format: date-time }
+
+    SetRolesRequest:
+      type: object
+      required: [ roles ]
+      properties:
+        roles:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum: [ ADMIN, OPS_MANAGER, BOOKING_CLERK, CUSTOMER_SERVICE, SENIOR_TICKETING, DRIVER, IT_TECH, PASSENGER ]
+
 
     StopCreateRequest:
       type: object

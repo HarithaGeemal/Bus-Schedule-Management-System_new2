@@ -18,11 +18,11 @@ public class Permission {
     @Column(nullable=false, unique=true, length=96)
     private String name;
 
+    @Setter
     @Column(length=255)
     private String description;
 
     @Column(name="created_at", nullable=false)
     private Instant createdAt = Instant.now();
 
-    public void setDescription(String d) { this.description = d; }
 }

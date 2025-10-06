@@ -1,10 +1,10 @@
 package com.company.bus_mgmt.service_impl.schedule;
 
-import com.company.busmgmt.domain.schedule.Route;
+import com.company.bus_mgmt.domain.schedule.Route;
 import com.company.bus_mgmt.exception.ConflictException;
 import com.company.bus_mgmt.exception.NotFoundException;
 import com.company.bus_mgmt.repository.schedule.RouteRepository;
-import com.company.busmgmt.service.schedule.RouteService;
+import com.company.bus_mgmt.service.schedule.RouteService;
 import com.company.bus_mgmt.web.dto.route.RouteCreateRequest;
 import com.company.bus_mgmt.web.dto.route.RouteResponse;
 import com.company.bus_mgmt.web.dto.route.RouteUpdateRequest;

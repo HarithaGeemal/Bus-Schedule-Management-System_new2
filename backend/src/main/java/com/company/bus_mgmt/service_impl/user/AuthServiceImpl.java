@@ -9,12 +9,17 @@ import com.company.bus_mgmt.security.JwtTokenProvider;
 import com.company.bus_mgmt.service.user.AuthService;
 import com.company.bus_mgmt.web.dto.auth.LoginRequest;
 import com.company.bus_mgmt.web.dto.auth.LoginResponse;
+import com.company.bus_mgmt.web.dto.auth.PublicRegisterRequest;
 import com.company.bus_mgmt.web.dto.user.UserCreateRequest;
 import com.company.bus_mgmt.web.dto.user.UserResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -30,6 +35,31 @@ public class AuthServiceImpl implements AuthService {
         this.encoder = encoder;
         this.tokens = tokens;
     }
+
+    @Override
+    @Transactional  // <-- ensure role create + user save is atomic
+    public UserResponse registerPassenger(PublicRegisterRequest req) {
+        User u = new User();
+        u.setEmail(req.email().toLowerCase());
+        u.setFullName(req.fullName());
+        u.setPhone(req.phone());
+        u.setPasswordHash(encoder.encode(req.password()));
+
+        // robust: try normalized lookup; if not present in this schema, create it
+        String roleKey = "PASSENGER";
+        Role passenger = roles.findByNameNormalized(roleKey.trim())
+                .orElseGet(() -> {
+                    Role r = new Role();
+                    r.setName(roleKey);
+                    r.setDescription("Self-registered passenger");
+                    return roles.save(r);
+                });
+
+        u.getRoles().add(passenger);
+        users.save(u);
+        return UserResponse.from(u);
+    }
+
 
     @Override
     public UserResponse register(UserCreateRequest req) {
@@ -50,8 +80,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest req) {
-        User u = users.findByEmail(req.email().toLowerCase())
+        User u = users.findByEmailWithRoles(req.email().toLowerCase())
                 .orElseThrow(() -> new NotFoundException("Invalid credentials"));
         if (!encoder.matches(req.password(), u.getPasswordHash())) {
             throw new NotFoundException("Invalid credentials");
