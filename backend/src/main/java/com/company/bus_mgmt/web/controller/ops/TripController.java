@@ -1,0 +1,55 @@
+package com.company.bus_mgmt.web.controller.ops;
+
+import com.company.bus_mgmt.service.ops.TripService;
+import com.company.bus_mgmt.web.dto.trip.TripCompactItem;
+import com.company.bus_mgmt.web.dto.trip.TripCreateRequest;
+import com.company.bus_mgmt.web.dto.trip.TripResponse;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/trips")
+public class TripController {
+
+    private final TripService trips;
+    public TripController(TripService trips) { this.trips = trips; }
+
+    @PostMapping
+    public TripResponse create(@Valid @RequestBody TripCreateRequest req) {
+        return trips.create(req);
+    }
+
+    @GetMapping
+    public org.springframework.data.domain.Page<TripResponse> search(
+            @RequestParam(required = false) String routeName,
+            @RequestParam(required = false) LocalDateTime from,
+            @RequestParam(required = false) LocalDateTime to,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return trips.search(routeName, from, to, PageRequest.of(Math.max(0, page - 1), size));
+    }
+
+    @GetMapping("/compact")
+    public List<TripCompactItem> compact(@RequestParam(required = false) String routeName,
+                                         @RequestParam(required = false) LocalDateTime from,
+                                         @RequestParam(required = false) LocalDateTime to,
+                                         @RequestParam(defaultValue = "200") int limit) {
+        return trips.compact(routeName, from, to, limit);
+    }
+
+    @PostMapping("/{id}:deactivate")
+    public void deactivate(@PathVariable Long id) { trips.deactivate(id); }
+
+    @PostMapping("/{id}:activate")
+    public void activate(@PathVariable Long id) { trips.activate(id); }
+
+    @PostMapping("/{id}:complete-if-past")
+    public void completeIfPast(@PathVariable Long id) { trips.completeIfPast(id); }
+
+    @GetMapping("/{id}")
+    public TripResponse get(@PathVariable Long id) { return trips.get(id); }
+}

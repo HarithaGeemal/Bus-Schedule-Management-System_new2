@@ -39,7 +39,20 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/routes/**").hasAnyRole("OPS_MANAGER","ADMIN")
                         .requestMatchers(HttpMethod.PUT,  "/api/routes/**").hasAnyRole("OPS_MANAGER","ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/routes/**").hasAnyRole("OPS_MANAGER","ADMIN")
-                        .anyRequest().authenticated()
+
+                        .requestMatchers(HttpMethod.POST, "/api/trips").hasAnyRole("OPS_MANAGER","ADMIN","IT_TECH")
+                        .requestMatchers(HttpMethod.GET,  "/api/trips/**").hasAnyRole("OPS_MANAGER","ADMIN","IT_TECH")
+                        .requestMatchers(HttpMethod.POST, "/api/trips/*:deactivate", "/api/trips/*:activate", "/api/trips/*:complete-if-past")
+                        .hasAnyRole("OPS_MANAGER","ADMIN","IT_TECH")
+
+                        .requestMatchers(HttpMethod.POST, "/api/assignments/by-lookup").hasAnyRole("OPS_MANAGER","ADMIN","IT_TECH")
+                        .requestMatchers(HttpMethod.GET,  "/api/assignments/available-buses", "/api/assignments/available-drivers")
+                        .hasAnyRole("OPS_MANAGER","ADMIN","IT_TECH")
+
+                        .requestMatchers(HttpMethod.POST, "/api/stops").hasAnyRole("OPS_MANAGER","ADMIN","IT_TECH")
+                        .requestMatchers(HttpMethod.GET,  "/api/stops").hasAnyRole("OPS_MANAGER","ADMIN","IT_TECH")
+
+                                .anyRequest().authenticated()
 
                 )
 
