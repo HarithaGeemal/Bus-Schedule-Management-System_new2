@@ -10,4 +10,6 @@ import java.time.LocalDateTime;
 public interface TripRepository extends JpaRepository<Trip, Long> {
     Page<Trip> findByRoute_NameContainingIgnoreCaseAndDepartureTimeBetween(
             String routeName, LocalDateTime from, LocalDateTime to, Pageable pg);
+    boolean existsByRoute_NameIgnoreCaseAndDepartureTimeAndArrivalTime(
+            String routeName, LocalDateTime departureTime, LocalDateTime arrivalTime);
 }

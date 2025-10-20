@@ -36,6 +36,16 @@ public class TripServiceImpl implements TripService {
         if (!req.arrivalTime().isAfter(req.departureTime()))
             throw new ConflictException("arrivalTime must be greater than departureTime");
 
+        boolean exists = trips.existsByRoute_NameIgnoreCaseAndDepartureTimeAndArrivalTime(
+                route.getName(), req.departureTime(), req.arrivalTime());
+        if (exists) {
+            throw new ConflictException(
+                    "A trip already exists for route '%s' at %s → %s"
+                            .formatted(route.getName(), req.departureTime(), req.arrivalTime())
+            );
+        }
+
+
         Trip t = new Trip();
         t.setRoute(route);
         t.setDepartureTime(req.departureTime());

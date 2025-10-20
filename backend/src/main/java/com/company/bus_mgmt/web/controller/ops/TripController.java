@@ -5,8 +5,11 @@ import com.company.bus_mgmt.web.dto.trip.TripCompactItem;
 import com.company.bus_mgmt.web.dto.trip.TripCreateRequest;
 import com.company.bus_mgmt.web.dto.trip.TripResponse;
 import com.company.bus_mgmt.web.dto.trip.TripUpdateRequest;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -34,11 +37,23 @@ public class TripController {
         return trips.search(routeName, from, to, PageRequest.of(Math.max(0, page - 1), size));
     }
 
-    @GetMapping("/compact")
-    public List<TripCompactItem> compact(@RequestParam(required = false) String routeName,
-                                         @RequestParam(required = false) LocalDateTime from,
-                                         @RequestParam(required = false) LocalDateTime to,
-                                         @RequestParam(defaultValue = "200") int limit) {
+    @GetMapping("/api/trips/compact")
+    public List<TripCompactItem> compact(
+            @Parameter(schema = @Schema(type = "string", format = "date-time"),
+                    example = "2025-10-20T17:01:31")
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime from,
+
+            @Parameter(schema = @Schema(type = "string", format = "date-time"),
+                    example = "2025-10-20T19:01:31")
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime to,
+
+            @RequestParam(required = false) String routeName,
+            @RequestParam(defaultValue = "200") int limit
+    ) {
         return trips.compact(routeName, from, to, limit);
     }
 
