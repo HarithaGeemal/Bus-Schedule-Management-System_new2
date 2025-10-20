@@ -27,4 +27,13 @@ public class StopController {
     public List<StopResponse> search(@RequestParam(required = false, name = "q") String q) {
         return stops.search(q);
     }
+
+    @PutMapping("/{id}")
+    public StopResponse rename(@PathVariable Long id, @RequestParam("name") String newName) {
+        return stops.rename(id, newName);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) { stops.delete(id); }
+
 }

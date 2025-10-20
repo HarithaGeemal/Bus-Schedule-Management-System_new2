@@ -8,4 +8,6 @@ import java.util.List;
 public interface StopService {
     StopResponse createAndAttach(StopCreateToRouteRequest req);
     List<StopResponse> search(String q);
+    StopResponse rename(Long stopId, String newName);
+    void delete(Long stopId);
 }

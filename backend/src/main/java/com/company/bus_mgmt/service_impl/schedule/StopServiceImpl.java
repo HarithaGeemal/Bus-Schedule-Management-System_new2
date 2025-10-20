@@ -55,4 +55,21 @@ public class StopServiceImpl implements StopService {
         var list = (q == null || q.isBlank()) ? stops.findAll() : stops.findByNameContainingIgnoreCase(q);
         return list.stream().map(StopResponse::from).toList();
     }
+
+    @Override
+    public StopResponse rename(Long stopId, String newName) {
+        var s = stops.findById(stopId).orElseThrow(() -> new NotFoundException("Stop not found"));
+        s.setName(newName);
+        stops.save(s);
+        return StopResponse.from(s);
+    }
+
+    @Override
+    public void delete(Long stopId) {
+        // optionally: check if used in route_stops and prevent delete
+        // long count = routeStops.countByStopId(stopId); (if you add such method)
+        // if (count>0) throw new ConflictException("Stop is attached to routes");
+        stops.deleteById(stopId);
+    }
+
 }

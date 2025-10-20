@@ -117,4 +117,58 @@ public class TripServiceImpl implements TripService {
             trips.save(t);
         }
     }
+
+    @Override
+    public TripResponse update(Long id, com.company.bus_mgmt.web.dto.trip.TripUpdateRequest req) {
+        var t = trips.findById(id).orElseThrow(() -> new com.company.bus_mgmt.exception.NotFoundException("Trip not found"));
+
+        if (req.routeName()!=null && !req.routeName().isBlank()) {
+            var route = routes.findByNameIgnoreCase(req.routeName())
+                    .orElseThrow(() -> new com.company.bus_mgmt.exception.NotFoundException("Route not found by name: "+req.routeName()));
+            t.setRoute(route);
+        }
+
+        if (req.tripType()!=null) {
+            var newType = com.company.bus_mgmt.domain.schedule.TripType.valueOf(req.tripType().toUpperCase());
+            t.setTripType(newType);
+            if (newType == com.company.bus_mgmt.domain.schedule.TripType.ONE_TIME) {
+                if (req.publishAt()==null && t.getPublishAt()==null)
+                    throw new com.company.bus_mgmt.exception.ConflictException("publishAt required for ONE_TIME trips");
+                if (req.publishAt()!=null) {
+                    if (req.publishAt().isBefore(java.time.LocalDateTime.now()))
+                        throw new com.company.bus_mgmt.exception.ConflictException("publishAt cannot be in the past");
+                    t.setPublishAt(req.publishAt());
+                }
+                t.setActive(false);
+            } else {
+                t.setPublishAt(null);
+                t.setActive(req.active()!=null ? req.active() : true);
+            }
+        } else if (t.getTripType()==com.company.bus_mgmt.domain.schedule.TripType.ONE_TIME && req.publishAt()!=null) {
+            if (req.publishAt().isBefore(java.time.LocalDateTime.now()))
+                throw new com.company.bus_mgmt.exception.ConflictException("publishAt cannot be in the past");
+            t.setPublishAt(req.publishAt());
+        }
+
+        var dep = req.departureTime()!=null ? req.departureTime() : t.getDepartureTime();
+        var arr = req.arrivalTime()!=null   ? req.arrivalTime()   : t.getArrivalTime();
+        if (!arr.isAfter(dep))
+            throw new com.company.bus_mgmt.exception.ConflictException("arrivalTime must be greater than departureTime");
+        t.setDepartureTime(dep);
+        t.setArrivalTime(arr);
+
+        if (req.status()!=null) t.setStatus(req.status());
+
+        trips.save(t);
+        return com.company.bus_mgmt.web.dto.trip.TripResponse.from(t);
+    }
+
+    @Override
+    public void delete(Long id) {
+        var t = trips.findById(id).orElseThrow(() -> new com.company.bus_mgmt.exception.NotFoundException("Trip not found"));
+        t.setStatus("CANCELLED");
+        t.setActive(false);
+        trips.save(t);
+    }
+
 }

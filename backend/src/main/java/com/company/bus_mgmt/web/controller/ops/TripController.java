@@ -4,6 +4,7 @@ import com.company.bus_mgmt.service.ops.TripService;
 import com.company.bus_mgmt.web.dto.trip.TripCompactItem;
 import com.company.bus_mgmt.web.dto.trip.TripCreateRequest;
 import com.company.bus_mgmt.web.dto.trip.TripResponse;
+import com.company.bus_mgmt.web.dto.trip.TripUpdateRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
@@ -52,4 +53,13 @@ public class TripController {
 
     @GetMapping("/{id}")
     public TripResponse get(@PathVariable Long id) { return trips.get(id); }
+
+    @PutMapping("/{id}")
+    public TripResponse update(@PathVariable Long id, @RequestBody TripUpdateRequest req) {
+        return trips.update(id, req);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) { trips.delete(id); }
+
 }
