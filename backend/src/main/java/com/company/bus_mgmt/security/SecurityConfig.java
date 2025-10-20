@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .exceptionHandling(h -> h.authenticationEntryPoint(entryPoint))
                 .addFilterBefore(new JwtAuthenticationFilter(tokens), UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(s -> s.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(reg -> reg
                         .requestMatchers("/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/actuator/health"
                                 ,"/v3/api-docs.yaml","/v3/api-docs/swagger-config").permitAll()
@@ -35,6 +36,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh","/api/auth/public/register").permitAll()
 //                        .requestMatchers(HttpMethod.POST, "/api/auth/public/register", "/api/public/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bookings/search", "/api/trips/*/seats","/api/routes", "/api/routes/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/routes/**").hasAnyRole("OPS_MANAGER","ADMIN")
+                        .requestMatchers(HttpMethod.PUT,  "/api/routes/**").hasAnyRole("OPS_MANAGER","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/routes/**").hasAnyRole("OPS_MANAGER","ADMIN")
                         .anyRequest().authenticated()
 
                 )

@@ -44,8 +44,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 };
                 at.setAuthenticated(true);
                 SecurityContextHolder.getContext().setAuthentication(at);
-            } catch (Exception ignored) {
-                // fall through -> no auth
+            } catch (Exception ex) {
+                System.err.println("[JWT] Failed to parse/validate token for " + req.getMethod() + " " + req.getRequestURI()
+                        + " : " + ex.getMessage());
+                SecurityContextHolder.clearContext();
             }
         }
         chain.doFilter(req, res);
