@@ -165,10 +165,11 @@ public class TripServiceImpl implements TripService {
 
     @Override
     public void delete(Long id) {
-        var t = trips.findById(id).orElseThrow(() -> new com.company.bus_mgmt.exception.NotFoundException("Trip not found"));
-        t.setStatus("CANCELLED");
-        t.setActive(false);
-        trips.save(t);
+        if (!trips.existsById(id)) {
+            throw new com.company.bus_mgmt.exception.NotFoundException("Trip not found");
+        }
+        trips.deleteById(id);
     }
+
 
 }
