@@ -129,7 +129,7 @@ public class TripServiceImpl implements TripService {
         }
 
         if (req.tripType()!=null) {
-            var newType = com.company.bus_mgmt.domain.schedule.TripType.valueOf(req.tripType().toUpperCase());
+            var newType = com.company.bus_mgmt.domain.schedule.TripType.from(req.tripType());
             t.setTripType(newType);
             if (newType == com.company.bus_mgmt.domain.schedule.TripType.ONE_TIME) {
                 if (req.publishAt()==null && t.getPublishAt()==null)

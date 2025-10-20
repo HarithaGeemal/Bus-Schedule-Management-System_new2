@@ -1045,12 +1045,23 @@ components:
     TripUpdateRequest:
       type: object
       properties:
-        routeId: { type: integer, format: int64 }
-        departureTime: { type: string, format: date-time }
-        arrivalTime: { type: string, format: date-time }
-        status: { type: string, enum: [SCHEDULED, CANCELLED, COMPLETED] }
-        busId: { type: integer, format: int64, nullable: true }
-        driverId: { type: integer, format: int64, nullable: true }
+        tripType:
+          type: string
+          enum: [ ONE_TIME, SCHEDULED ]
+          example: ONE_TIME
+        publishAt:
+          type: string
+          format: date-time
+        departureTime:
+          type: string
+          format: date-time
+        arrivalTime:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+        status:
+          type: string
 
     TripResponse:
       type: object
