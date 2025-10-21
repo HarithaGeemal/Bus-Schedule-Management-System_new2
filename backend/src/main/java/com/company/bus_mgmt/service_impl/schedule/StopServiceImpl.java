@@ -1,6 +1,7 @@
 package com.company.bus_mgmt.service_impl.schedule;
 
 import com.company.bus_mgmt.domain.schedule.RouteStop;
+import com.company.bus_mgmt.domain.schedule.RouteStopId;
 import com.company.bus_mgmt.domain.schedule.Stop;
 import com.company.bus_mgmt.exception.NotFoundException;
 import com.company.bus_mgmt.repository.schedule.RouteRepository;
@@ -40,7 +41,18 @@ public class StopServiceImpl implements StopService {
                     return stops.save(s);
                 });
 
-        RouteStop rs = new RouteStop();
+        RouteStopId key = new RouteStopId(route.getId(), stop.getId());
+
+        var existing = routeStops.findById(key).orElse(null);
+        if (existing != null) {
+            existing.setStopOrder(req.stopOrder());
+            existing.setArrivalOffsetMin(req.arrivalOffsetMin());
+            routeStops.save(existing); // merge/update
+            return StopResponse.from(stop);
+        }
+
+        var rs = new RouteStop();
+
         rs.setRoute(route);
         rs.setStop(stop);
         rs.setStopOrder(req.stopOrder());
